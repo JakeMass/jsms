@@ -1,0 +1,27 @@
+{
+  "name": "jsms",
+  "version": "0.0.1",
+  "description": "First alpha version",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JakeMass/jsms.git"
+  },
+  "keywords": [
+    "model",
+    "axios",
+    "frontend"
+  ],
+  "author": "Jakob Maßem",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JakeMass/jsms/issues"
+  },
+  "homepage": "https://github.com/JakeMass/jsms#readme",
+  "devDependencies": {
+    "axios": "^1.1.2"
+  }
+}
