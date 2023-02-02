@@ -11,16 +11,18 @@ The full example code can be found under src/models and src/collections
 ### How to define a model
 To define a model just create a class like so:
 
-<pre>
-import { Model } from '../traits/model'
-import { defineConfig } from './defaults'
+```javascript
+import { Model } from 'jsmsytem/traits'
+import { defineModelConfig } from 'jsmsytem'
 
 export class User {
     static attributes = ['id', 'name', 'email', 'created_at', 'updated_at', 'deleted_at']
 
-    static config = defineConfig({
-        basePath: '/api/user',
-    })
+    static init() {
+        User.config = defineModelConfig({
+            basePath: '/api/user',
+        })
+    }
 
     constructor(data) {
         Model.init(this, User, data)
@@ -30,7 +32,7 @@ export class User {
         return await Model.create(data, User)
     }
 }
-</pre>
+```
 
 To see which values can be set on config refer to src/models/defaults.js.<br>
 
@@ -41,85 +43,86 @@ At this stage we are basically done with implementing a very simple user model f
 
 <b>Creating a model:</b><br>
 We will assume that the server endpoint for creating a new resource expects the name, email and password to be send.
-<pre>
+```javascript
 const user = await User.create({
     name: 'John Doe',
     email: jon.doe@email.com,
     password: 'password'
 })
-</pre>
+```
 
 <b>Getting a model:</b><br>
 To retrieve a user with the id '2' from the database:
-<pre>
+```javascript
 const user = await Model.get(2, User)
-</pre>
+```
 
 <b>Changing the model:</b></br>
 In the background JSMS will define getters and setters for the attributes defined in the static class
 property attributes.
 To change an attribute of the user just change the property:
-<pre>
+```javascript
 user.name = 'Jane Doe'
-</pre>
+```
 
 This will not send an patch request to the backend yet. If we want to send the patch request and update the resource on the database:
-<pre>
+```javascript
 user.update()
-</pre>
+```
 
 If instead we want to reset the model to its initial state:
-<pre>
+```javascript
 user.reset()
-</pre>
+```
 
 <b>Deleting the model:</b></br>
 If we want to delete the model:
-<pre>
+```javascript
 user.delete()
-</pre>
+```
 This will send a simple delete request to user.deletePath to the backend. If your resource is working with
 soft deletion you can run:
-<pre>
+```javascript
 user.forceDelete()
-</pre>
+```
 This will also send a delete request but to user.forceDeletePath
 
 ### Defining relations on model
 Normally a user has severel relations like its role or permissions.
 The Relation-Trait helps us to work with related resources. It is expected, that you send the response from the backend as such:
-<pre>
+```json
 {
     "relations": {
         "permissions": [1,4,...],   // These are the keys of all related permissions
         "role": 2                   // This is the key of the related role
     }
 }
-</pre>
+```
 
 If we want to work with relations on the model we have to implement the Relation-Trait like so:
-<pre>
-import { Model } from '../traits/model'
+```javascript
+import { Model, Relation } from 'jsmsystem/traits'
+import { defineModelConfig } from 'jsmsystem'
 import { PermissionCollection } from '../collections/permissions'
-import { Relation } from '../traits/relations'
 import { Role } from './role'
-import { defineConfig } from './defaults'
 
 export class User {
     static attributes = ['id', 'name', 'email', 'created_at', 'updated_at', 'deleted_at']
 
-    static config = defineConfig({
-        basePath: '/api/user',
-    })
+    static init() {
+        User.config = defineModelConfig({
+            basePath: '/api/user',
+        })
 
-    static relations = {
-        permissions: {
-            type: 'collection',
-            value: PermissionCollection,
-        },
-        role: {
-            type: 'model',
-            value: Role
+        User.relations = {
+            permissions: {
+                type: 'collection',
+                value: PermissionCollection,
+            },
+            role: {
+                type: 'model',
+                value: Role
+            }
         }
     }
 
@@ -132,7 +135,7 @@ export class User {
         return await Model.create(data, User)
     }
 }
-</pre>
+```
 To use the Relation-Trait we have to have implemented the Model-Trait.
 
 <b>Fetch relations:</b></br>
@@ -141,19 +144,19 @@ the proper model(s).
 Otherwise we will only have access to the keys provided by the response from the backend.
 
 We want to only fetch the role relation from the user:
-<pre>
+```javascript
 user.fetchRelation('role')
-</pre>
+```
 
 We want to fetch all relations:
-<pre>
+```javascript
 user.fetchRelations()
-</pre>
+```
 The function fetchRelation also takes in an array of strings with the names of the relations to be fetched.
 
 <b>Update relations:</b></br>
 To update the relations:
-<pre>
+```javascript
 // Update role to 5
 user.updateRelation('role', 5)
 
@@ -164,11 +167,11 @@ user.updateRelations({
         permissions: [2,3]
     }
 })
-</pre>
+```
 
 ### Serverside response
 You have to serve the user resource or any resource in a specific format:
-<pre>
+```json
 {
     // This part will be used by the Model-Trait
     "attributes": {
@@ -185,4 +188,4 @@ You have to serve the user resource or any resource in a specific format:
         "role": 1
     }
 }
-</pre>
+```
