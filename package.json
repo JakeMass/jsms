@@ -16,7 +16,7 @@
     "frontend"
   ],
   "author": "Jakob Maßem",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/JakeMass/jsms/issues"
   },
